@@ -1,0 +1,53 @@
+[project]
+name = "enjam"
+dynamic = ["version"]
+description = "batch convert videos"
+authors = [
+    {name = "Evstifeev Roman", email = "someuniquename@gmail.com"},
+]
+dependencies = [
+    "typer>=0.12.4",
+    "django-environ>=0.9.0",
+    "rich>=13.4.2",
+    "shellingham>=1.5.0.post1",
+    "python-ffmpeg>=2.0.4",
+    "aiometer>=0.4.0",
+    "loguru>=0.7.0",
+    "humanize>=4.7.0",
+]
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+distribution = true
+# plugins = ["pdm-shell"]
+
+[tool.pdm.version]
+source = "file"
+path = "src/enjam/__init__.py"
+
+
+[tool.pdm.dev-dependencies]
+test = [
+    "pytest>=8.3.2",
+    "pytest-cov>=5.0.0",
+]
+debug = [
+    "ipdb>=0.13.13",
+]
+
+
+[tool.pdm.scripts]
+_.env_file = "env-local"
+main = {call= "enjam.main:app"}
+# tt = {call= "enjam.main:tt"}
+# tt = {call= "enjam.main:app2"}
+
+[project.scripts]
+# Install executable cli app with this package distribution.
+enjam = "enjam.main:app"
