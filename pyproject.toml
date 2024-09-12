@@ -45,8 +45,6 @@ debug = [
 [tool.pdm.scripts]
 _.env_file = "env-local"
 main = {call= "enjam.main:app"}
-# tt = {call= "enjam.main:tt"}
-# tt = {call= "enjam.main:app2"}
 
 [project.scripts]
 # Install executable cli app with this package distribution.
