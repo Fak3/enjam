@@ -87,7 +87,10 @@ async def main(
         set to the same pattern as dst dir name. Example: {vcodec}-{crf}-""",
         show_default="f'{dst.name}-' if '{' in dst else None"
     )] = None,
-    gop: int = 200,
+    gop: Annotated[int, Option(
+        help="""Group of pictures size. The GOP size sets the maximum distance
+        between key frames. Higher GOP size results in smaller file size. """
+    )] = 200,
     grain: int = 0,
     write_log: bool = True,
     verbose: bool = False,
