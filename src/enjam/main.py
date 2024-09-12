@@ -141,9 +141,9 @@ async def main(
     if write_log:
         def formatter(record: loguru.Record) -> str:
             if "srcfile" in record["extra"]:
-                return "{time:HH:mm:ss} {extra[srcfile]} {message}"
+                return "{time:HH:mm:ss} {extra[srcfile]} {message}\n"
             else:
-                return "{time:HH:mm:ss} {message}"
+                return "{time:HH:mm:ss} {message}\n"
 
         logger.add(dstdir / 'enjam-log.txt', format=formatter, level='DEBUG' if verbose else 'INFO')
 
