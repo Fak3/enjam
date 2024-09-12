@@ -236,15 +236,17 @@ async def main(
         """ Main job. Convert one file, return compression ratio. """
 
         outfile = dstdir / srcfile.relative_to(srcdir).with_suffix('.mp4')
-        if outfile == srcfile:
-            raise ValueError(
-                f'Will not overwrite {srcfile.name}, choose another destinaton dir!'
-            )
-
-        outfile.parent.mkdir(parents=True, exist_ok=True)
 
         if fprefix:
             outfile = outfile.with_stem(fprefix + outfile.stem)
+
+        if outfile == srcfile:
+            raise ValueError(
+                f'Will not overwrite {srcfile.name}, choose another destinaton dir, or '
+                ' set --fprefix.'
+            )
+
+        outfile.parent.mkdir(parents=True, exist_ok=True)
 
         nframes, resolution = None, None
         try:
