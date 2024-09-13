@@ -315,9 +315,8 @@ async def main(
         if 'gif' in pattern:
             quality['vf'] = "scale=trunc(iw/2)*2:trunc(ih/2)*2"
 
-        # return 0
-            # .option('loglevel', 'quiet')
-        # print('AAA')
+        # .option('loglevel', 'quiet')
+
         ffmpeg = FFmpeg().option("y").option('hide_banner')\
             .option('nostdin')\
             .input(srcdir/srcfile).output(outfile,
@@ -333,15 +332,11 @@ async def main(
                     # 'qp': 83
                 },
                 'libx265': {"codec:v": "libx265",
-                    # 'rav1e-params': f'keyint={gop}',
-                    # 'preset': 'veryslow',
-                    'preset': speed,
+                    'preset': speed,  # see libx264 presets below
                     # 'qp': 40,  # 0-51
-                    # 'crf': crf,
                     'tune': 'ssim',
                 },
                 'libx264': {"codec:v": "libx264",
-                    # 'rav1e-params': f'keyint={gop}',
                     # $ x264 --fullhelp
                     # - ultrafast:
                     #   --no-8x8dct --aq-mode 0 --b-adapt 0
@@ -385,7 +380,6 @@ async def main(
                     #   --trellis 2
                     'preset': speed,
                     # 'qp': 83
-                    # 'crf': crf,
                     'tune': 'ssim',
                 },
                 'libsvtav1': {"codec:v": "libsvtav1",
@@ -418,7 +412,6 @@ async def main(
 
         @ffmpeg.on("stderr")
         def on_stderr(message: str) -> None:
-            # print(123, message)
             if '[error]' not in message \
                and 'Error' not in message \
                and 'out of range' not in message \
