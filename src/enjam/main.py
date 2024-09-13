@@ -77,6 +77,7 @@ async def main(
     )] = None,
     abitrate: str = '38k',
     crf: Annotated[int, Option(
+        min=0, max=63,  # libsvtav1 limits. TODO: check other codecs
         help="""Constant rate factor. Or qp for rav1e.""",
         show_default="24, if vbitrate is not set"
     )] = None,
