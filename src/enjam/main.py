@@ -39,7 +39,25 @@ from .aiotyper import AsyncTyper
 app = AsyncTyper(name='enjam', pretty_exceptions_enable=True)
 
 VCodecs = StrEnum('VCodecs', 'libaom-av1 librav1e libsvtav1 libx264 libx265 copy'.split())
-# 
+
+# Libx264Presets = StrEnum('Libx264Presets', [x.strip() for x in """
+
+SpeedPresets = StrEnum('SpeedPresets',
+    [x.strip() for x in """
+        ultrafast
+        superfast
+        veryfast
+        faster
+        fast
+        medium
+        slow
+        slower
+        veryslow
+        placebo""".split()] +
+    list(str(x) for x in range(-2, 14))
+)
+
+
 # ffmpeg -i in.gif -c:v libaom-av1 -cpu-used 3 -threads 12 -crf 20 -arnr-max-frames 3 -arnr-strength 1 -aq-mode 1 -lag-in-frames 48 -aom-params sb-size=64:enable-qm=1:enable-dnl-denoising=0:deltaq-mode=0 -pix_fmt yuv420p10le -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pass 1 -an -f null /dev/null && ffmpeg -i in.gif -c:v libaom-av1 -cpu-used 3 -threads 12 -crf 22 -arnr-max-frames 3 -arnr-strength 1 -aq-mode 1 -lag-in-frames 48 -aom-params sb-size=64:enable-qm=1:enable-dnl-denoising=0:deltaq-mode=0 -pix_fmt yuv420p10le -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pass 2 out.mp4 
 # 
 # ffmpeg -i in.gif -movflags faststart -pix_fmt yuv420p -c:v libaom-av1 -cpu-used 6 -threads 12 -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" out.mp4
@@ -81,7 +99,12 @@ async def main(
         help="""Constant rate factor. Or qp for rav1e.""",
         show_default="24, if vbitrate is not set"
     )] = None,
-    speed: str = '7',
+    speed: Annotated[SpeedPresets, Option(
+        # int | Libx264Presets
+        # TODO: Typer Currently doesn't support Union types
+        # https://github.com/fastapi/typer/issues/461
+        help="Speed preset. String for x264/x265. Numeric for av1. Lower is slower."
+    )] = '7',
     fprefix: Annotated[str, Option(
         help="""Output file prefix. Can include variables.
         If fprefix is not provided and dst dir includes variables, fprefix is
@@ -318,7 +341,48 @@ async def main(
                 },
                 'libx264': {"codec:v": "libx264",
                     # 'rav1e-params': f'keyint={gop}',
-                    # 'preset': 'veryslow',
+                    # $ x264 --fullhelp
+                    # - ultrafast:
+                    #   --no-8x8dct --aq-mode 0 --b-adapt 0
+                    #   --bframes 0 --no-cabac --no-deblock
+                    #   --no-mbtree --me dia --no-mixed-refs
+                    #   --partitions none --rc-lookahead 0 --ref 1
+                    #   --scenecut 0 --subme 0 --trellis 0
+                    #   --no-weightb --weightp 0
+                    # - superfast:
+                    #   --no-mbtree --me dia --no-mixed-refs
+                    #   --partitions i8x8,i4x4 --rc-lookahead 0
+                    #   --ref 1 --subme 1 --trellis 0 --weightp 1
+                    # - veryfast:
+                    #   --no-mixed-refs --rc-lookahead 10
+                    #   --ref 1 --subme 2 --trellis 0 --weightp 1
+                    # - faster:
+                    #   --no-mixed-refs --rc-lookahead 20
+                    #   --ref 2 --subme 4 --weightp 1
+                    # - fast:
+                    #   --rc-lookahead 30 --ref 2 --subme 6
+                    #   --weightp 1
+                    # - medium:
+                    #   Default settings apply.
+                    # - slow:
+                    #   --direct auto --rc-lookahead 50 --ref 5
+                    #   --subme 8 --trellis 2
+                    # - slower:
+                    #   --b-adapt 2 --direct auto --me umh
+                    #   --partitions all --rc-lookahead 60
+                    #   --ref 8 --subme 9 --trellis 2
+                    # - veryslow:
+                    #   --b-adapt 2 --bframes 8 --direct auto
+                    #   --me umh --merange 24 --partitions all
+                    #   --ref 16 --subme 10 --trellis 2
+                    #   --rc-lookahead 60
+                    # - placebo:
+                    #   --bframes 16 --b-adapt 2 --direct auto
+                    #   --slow-firstpass --no-fast-pskip
+                    #   --me tesa --merange 24 --partitions all
+                    #   --rc-lookahead 60 --ref 16 --subme 11
+                    #   --trellis 2
+
                     'preset': speed,
                     # 'qp': 83
                     # 'crf': crf,
