@@ -281,7 +281,7 @@ async def main(
         else:
             vb = vbitrate
 
-        logger.debug(f'{srcfile} resolution {resolution} crf {crf} bitrate {vb}')
+        logger.debug(f'Resolution {resolution} crf {crf} bitrate {vb}')
 
         if crf and vcodec == 'librav1e':
             quality = {'qp': crf}  # no support for crf, use quantization parameter
