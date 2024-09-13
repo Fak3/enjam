@@ -356,12 +356,17 @@ async def main(
         def on_stderr(message: str) -> None:
             # print(123, message)
             if '[error]' not in message \
-               and 'Error opening' not in message \
+               and 'Error' not in message \
+               and 'out of range' not in message \
                and 'failed' not in message:
                 return
             logger.warning(message)
             if verbose:
                 progressbar.log(f'{srcfile} {message}')
+
+        @ffmpeg.on("start")
+        def on_start(arguments: str) -> None:
+            logger.debug(f"FFMPEG command: '{' '.join(arguments)}'")
 
         @ffmpeg.on("progress")
         def on_progress(progress):
