@@ -163,3 +163,5 @@ cython_debug/
 
 # Kate temp files
 .kate-swp
+
+enjam-log.txt
