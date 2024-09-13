@@ -228,7 +228,7 @@ async def main(
                 return await _convert(srcfile, task)
             except Exception as err:
                 progressbar.update(task, completed=100, info=f'ERR ')
-                logger.error(str(err))
+                logger.error(repr(err))
                 if not skip_errors:
                     raise err  # Abort all tasks.
         return 0
