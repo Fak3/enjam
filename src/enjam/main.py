@@ -252,6 +252,7 @@ async def main(
             except Exception as err:
                 progressbar.update(task, completed=100, info=f'ERR ')
                 logger.error(repr(err))
+                progressbar.log(f'{srcfile} {repr(err)}')
                 if not skip_errors:
                     raise err  # Abort all tasks.
         return 0
@@ -382,7 +383,6 @@ async def main(
                     #   --me tesa --merange 24 --partitions all
                     #   --rc-lookahead 60 --ref 16 --subme 11
                     #   --trellis 2
-
                     'preset': speed,
                     # 'qp': 83
                     # 'crf': crf,
@@ -429,8 +429,9 @@ async def main(
                 progressbar.log(f'{srcfile} {message}')
 
         @ffmpeg.on("start")
-        def on_start(arguments: str) -> None:
-            logger.debug(f"FFMPEG command: '{' '.join(arguments)}'")
+        def on_start(arguments: list[str]) -> None:
+            args = (f'"{arg}"' if arg.startswith('/') else arg for arg in arguments)
+            logger.debug(f"FFMPEG command: {' '.join(args)}")
 
         @ffmpeg.on("progress")
         def on_progress(progress):
