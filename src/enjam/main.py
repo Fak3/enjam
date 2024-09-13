@@ -159,15 +159,15 @@ async def main(
             logger.error(msg)
             raise BadParameter(msg) from err
 
-    if fprefix:
-        fprefix = fprefix.format(**locals()).replace('lib', '')
-
     if vbitrate and crf:
         raise UsageError("Specify only one option --crf or --vbitrate")
 
     if not vbitrate and not crf:
         crf = 24
         logger.debug(f"Setting default crf to {crf}.")
+
+    if fprefix:
+        fprefix = fprefix.format(**locals()).replace('lib', '')
 
     # source_files = glob('**/*.gif', root_dir=srcdir, recursive=True)
 
