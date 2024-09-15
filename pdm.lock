@@ -5,7 +5,7 @@
 groups = ["default", "debug", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.5.0"
-content_hash = "sha256:0f3e3597267902c434c01a2f5d8f191bcf8ff875bc9fd2f4398e9ca42891e266"
+content_hash = "sha256:afdd1260b07ffe6d2e52eabba8c2b5f08a1f325fd677ed2cf91488019a556e42"
 
 [[metadata.targets]]
 requires_python = ">=3.11"
@@ -260,6 +260,16 @@ summary = "A package that allows you to utilize 12factor inspired environment va
 files = [
     {file = "django-environ-0.10.0.tar.gz", hash = "sha256:b3559a91439c9d774a9e0c1ced872364772c612cdf6dc919506a2b13f7a77225"},
     {file = "django_environ-0.10.0-py2.py3-none-any.whl", hash = "sha256:510f8c9c1d0a38b0815f91504270c29440a0cf44fab07f55942fa8d31bbb9be6"},
+]
+
+[[package]]
+name = "execnet"
+version = "2.1.1"
+requires_python = ">=3.8"
+summary = "execnet: rapid multi-Python deployment"
+files = [
+    {file = "execnet-2.1.1-py3-none-any.whl", hash = "sha256:26dee51f1b80cebd6d0ca8e74dd8745419761d3bef34163928cbebbdc4749fdc"},
+    {file = "execnet-2.1.1.tar.gz", hash = "sha256:5189b52c6121c24feae288166ab41b32549c7e2348652736540b9e6e7d4e72e3"},
 ]
 
 [[package]]
@@ -545,6 +555,20 @@ dependencies = [
 files = [
     {file = "pytest-cov-5.0.0.tar.gz", hash = "sha256:5837b58e9f6ebd335b0f8060eecce69b662415b16dc503883a02f45dfeb14857"},
     {file = "pytest_cov-5.0.0-py3-none-any.whl", hash = "sha256:4f0764a1219df53214206bf1feea4633c3b558a2925c8b59f144f682861ce652"},
+]
+
+[[package]]
+name = "pytest-xdist"
+version = "3.6.1"
+requires_python = ">=3.8"
+summary = "pytest xdist plugin for distributed testing, most importantly across multiple CPUs"
+dependencies = [
+    "execnet>=2.1",
+    "pytest>=7.0.0",
+]
+files = [
+    {file = "pytest_xdist-3.6.1-py3-none-any.whl", hash = "sha256:9ed4adfb68a016610848639bb7e02c9352d5d9f03d04809919e2dafc3be4cca7"},
+    {file = "pytest_xdist-3.6.1.tar.gz", hash = "sha256:ead156a4db231eec769737f57668ef58a2084a34b2e55c4a8fa20d861107300d"},
 ]
 
 [[package]]

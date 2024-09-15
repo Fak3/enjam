@@ -36,6 +36,7 @@ path = "src/enjam/__init__.py"
 test = [
     "pytest>=8.3.2",
     "pytest-cov>=5.0.0",
+    "pytest-xdist>=3.6.1",
 ]
 debug = [
     "ipdb>=0.13.13",
