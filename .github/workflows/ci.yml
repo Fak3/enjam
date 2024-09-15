@@ -30,20 +30,11 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup ffmpeg
         uses: FedericoCarboni/setup-ffmpeg@v3
-          # A specific version to download, may also be "release" or a specific version
-          # like "6.1.0". At the moment semver specifiers (i.e. >=6.1.0) are supported
-          # only on Windows, on other platforms they are allowed but version is matched
-          # exactly regardless.
+        with:
           ffmpeg-version: release
-          # Target architecture of the ffmpeg executable to install. Defaults to the
-          # system architecture. Only x64 and arm64 are supported (arm64 only on Linux).
           architecture: 'x64'
-          # Linking type of the binaries. Use "shared" to download shared binaries and
-          # "static" for statically linked ones. Shared builds are currently only available
-          # for windows releases. Defaults to "static"
           linking-type: static
       - name: Setup Python Versions
         uses: actions/setup-python@v5
