@@ -12,6 +12,9 @@ Successfully processed 2 files
 Failed to process 2 files
 ```
 
+
+![Github Actions](https://github.com/Fak3/enjam/workflows/Tests/badge.svg)
+
 # Enjam
 
 Batch convert video files.
