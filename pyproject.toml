@@ -19,6 +19,17 @@ requires-python = ">=3.11"
 readme = "README.md"
 license = {text = "MIT"}
 
+keywords = ["ffmpeg", "encoder", "cli"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"

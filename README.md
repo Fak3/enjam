@@ -12,6 +12,7 @@ Successfully processed 2 files
 Failed to process 2 files
 ```
 
+[![PyPI Version](https://img.shields.io/pypi/v/enjam)](https://pypi.org/project/enjam/)
 
 ![Github Actions](https://github.com/Fak3/enjam/workflows/Tests/badge.svg)
 
