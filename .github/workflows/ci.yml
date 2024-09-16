@@ -71,4 +71,4 @@ jobs:
           pdm run pip install -U setuptools
           pdm info
       - name: Run Tests
-        run: pdm run pytest -n auto
+        run: pdm run pytest --doctest-modules -n auto
