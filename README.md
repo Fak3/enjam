@@ -1,19 +1,6 @@
-```
-$ enjam --dst /tmp/crf{crf} --vcodec libaom-av1 --crf 24
-Destination dir /tmp/crf24
-Found 4 files
-  ERR  /home/z/pproj/enjam/tests/empty-two.gif 100% 0:00:00
-  0.2x /home/z/pproj/enjam/tests/64pix.gif     100% 0:00:00
-  0.1x /home/z/pproj/enjam/tests/1pix.gif      100% 0:00:00
-  ERR  /home/z/pproj/enjam/tests/empty-one.gif 100% 0:00:00
-Average compression ratio: 0.1
-All finished in 0:00:00.325396
-Successfully processed 2 files
-Failed to process 2 files
-```
+![Screenshot](Screenshot.png)
 
 [![PyPI Version](https://img.shields.io/pypi/v/enjam)](https://pypi.org/project/enjam/)
-
 ![Github Actions](https://github.com/Fak3/enjam/workflows/Tests/badge.svg)
 
 # Enjam
