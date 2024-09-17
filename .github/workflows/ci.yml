@@ -28,12 +28,13 @@ jobs:
       matrix:
         python-version: ["3.11", "3.12.6"]
         os: [ubuntu-latest, windows-latest, macos-latest]
+        ffmpeg-version: ["6.1.0", "7.0.2"]
     steps:
       - uses: actions/checkout@v4
-      - name: Setup ffmpeg
+      - name: Setup ffmpeg ${{ matrix.ffmpeg-version }}
         uses: FedericoCarboni/setup-ffmpeg@v3
         with:
-          ffmpeg-version: release
+          ffmpeg-version: ${{ matrix.ffmpeg-version }}
           architecture: 'x64'
           linking-type: static
       - name: Setup Python Versions
