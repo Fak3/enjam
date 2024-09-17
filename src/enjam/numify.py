@@ -18,8 +18,8 @@ def numify(alphanum: str) -> float:
 
     >>> numify('72')
     72.0
-    >>> numify('2k')
-    2000.0
+    >>> numify('2.1k')
+    2100.0
     >>> numify('41 K')
     41000.0
     >>> numify('-3   M')
