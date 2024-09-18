@@ -28,15 +28,22 @@ jobs:
       matrix:
         python-version: ["3.11", "3.12.6"]
         os: [ubuntu-latest, windows-latest, macos-latest]
-        ffmpeg-version: ["6.1.0", "7.0.2"]
+        ffmpeg-version: ["6.1", "7.0"]
     steps:
       - uses: actions/checkout@v4
-      - name: Setup ffmpeg ${{ matrix.ffmpeg-version }}
-        uses: FedericoCarboni/setup-ffmpeg@v3
+
+      - name: Setup FFmpeg
+        uses: AnimMouse/setup-ffmpeg@v1
         with:
-          ffmpeg-version: ${{ matrix.ffmpeg-version }}
-          architecture: 'x64'
-          linking-type: static
+          version: ${{ matrix.ffmpeg-version }}
+
+      # - name: Setup ffmpeg ${{ matrix.ffmpeg-version }}
+      #   uses: FedericoCarboni/setup-ffmpeg@v3
+      #   with:
+      #     ffmpeg-version: ${{ matrix.ffmpeg-version }}
+      #     architecture: 'x64'
+      #     linking-type: static
+
       - name: Setup Python Versions
         uses: actions/setup-python@v5
         with:
