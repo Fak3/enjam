@@ -19,12 +19,14 @@ import subprocess
 import sys
 
 import loguru
+import rich
 from aiometer import amap
 from click import BadParameter, BadOptionUsage, UsageError
 from ffmpeg.asyncio import FFmpeg
 from humanize import naturalsize
 from loguru import logger
 from rich import print
+from rich.markup import escape
 from rich.progress import (
     Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn,
     TaskProgressColumn, Task
@@ -420,11 +422,12 @@ async def main(
             if '[error]' not in message \
                and 'Error' not in message \
                and 'out of range' not in message \
-               and 'failed' not in message:
+               and 'failed' not in message \
+               and not message.startswith('['):
                 return
             logger.warning(message)
             if verbose:
-                progressbar.log(f'{srcfile} {message}')
+                progressbar.log(rich.markup.escape(f'{srcfile}\n{message}'))
 
         @ffmpeg.on("start")
         def on_start(arguments: list[str]) -> None:
