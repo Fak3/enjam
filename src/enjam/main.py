@@ -9,6 +9,7 @@ from functools import partial
 from fractions import Fraction
 from glob import glob
 from pathlib import Path
+from signal import SIGKILL
 from typing import Optional, Literal
 import asyncio
 import logging
@@ -39,6 +40,7 @@ from .aiotyper import AsyncTyper
 
 # app = AsyncTyper(name='enjam', pretty_exceptions_enable=True, rich_markup_mode=None)
 app = AsyncTyper(name='enjam', pretty_exceptions_enable=True)
+run = partial(app, standalone_mode=False)
 
 VCodecs = StrEnum('VCodecs', 'libaom-av1 librav1e libsvtav1 libx264 libx265 copy'.split())
 
@@ -437,7 +439,18 @@ async def main(
                 completed=(int(progress.frame) / nframes * 100) if nframes else 0
             )
 
-        await ffmpeg.execute()
+        try:
+            await ffmpeg.execute()
+        except asyncio.CancelledError:
+            if verbose:
+                progressbar.log(f'Task cancelled {ffmpeg}')
+            logger.debug(f'Task cancelled')
+
+            if sys.platform == "win32":
+                ffmpeg.terminate()
+            else:
+                ffmpeg._process.send_signal(SIGKILL)
+            return
 
         # await sleep(0.5)
         ratio = float(srcfile.stat().st_size) / outfile.stat().st_size
@@ -452,10 +465,19 @@ async def main(
     start_time = datetime.now()
     ratios = []
 
-    with progressbar:
-        async with amap(convert, source_files, max_at_once=jobs) as results:
-            async for ratio in results:
-                ratios.append(ratio)
+    try:
+        with progressbar:
+            # async with asyncio.TaskGroup() as tg:
+            #     for srcfile in source_files:
+            #         tg.create_task(convert(srcfile))
+            async with amap(convert, source_files, max_at_once=jobs) as results:
+                async for ratio in results:
+                    ratios.append(ratio)
+    except asyncio.CancelledError as e:
+        logger.warning(f'Main task cancelled')
+        # return
+        sys.exit(1)
+
 
     await sleep(0.001)
 
@@ -472,4 +494,4 @@ async def main(
 
     
 if __name__ == '__main__':
-    app()
+    app(standalone_mode=False)

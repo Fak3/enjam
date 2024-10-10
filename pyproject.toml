@@ -60,4 +60,4 @@ main = {call= "enjam.main:app"}
 
 [project.scripts]
 # Install executable cli app with this package distribution.
-enjam = "enjam.main:app"
+enjam = "enjam.main:run"
