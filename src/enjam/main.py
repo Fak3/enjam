@@ -28,6 +28,8 @@ from rich.progress import (
     Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn,
     TaskProgressColumn, Task
 )
+from rich.table import Column
+
 from typer import Option, Abort
 from typing_extensions import Annotated
 
@@ -211,7 +213,8 @@ async def main(
         # TextColumn("[progress.description]{task.fields[ratio]} {task.description}"),
         TextColumn(
             "{task.fields[info]} {task.description}" +
-            (" {task.fields[frame]}/{task.fields[nframes]} frames" if verbose else "")
+            (" {task.fields[frame]}/{task.fields[nframes]} frames" if verbose else ""),
+            table_column = Column(overflow='ellipsis')
         ),
         # BarColumn(),
         TaskProgressColumn(),
