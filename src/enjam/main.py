@@ -45,6 +45,7 @@ app = AsyncTyper(name='enjam', pretty_exceptions_enable=True)
 run = partial(app, standalone_mode=False)
 
 VCodecs = StrEnum('VCodecs', 'libaom-av1 librav1e libsvtav1 libx264 libx265 copy'.split())
+FlieFormat = StrEnum('FlieFormat', ['mp4', 'mkv'])
 
 # Libx264Presets = StrEnum('Libx264Presets', [x.strip() for x in """
 
@@ -127,7 +128,12 @@ async def main(
     skip_errors: Annotated[bool, Option(
         help="""Continue processing queue after one file error""",
     )] = True,
-    pattern: str = '*.gif',
+    pattern: Annotated[str, Option(
+        help="""Source file glob search pattern. Example: 'Camera1*.mp4' """,
+    )] = '*.gif',
+    outformat: Annotated[FlieFormat, Option(
+        help="""Output file format. """,
+    )] = FlieFormat.mkv,
     # force: Annotated[
     #     bool, Option(prompt="Are you sure you want to overwrite destination files?")
     # ],
@@ -267,7 +273,7 @@ async def main(
     async def _convert(srcfile: Path, task: Task) -> int:
         """ Main job. Convert one file, return compression ratio. """
 
-        outfile = dstdir / srcfile.relative_to(srcdir).with_suffix('.mp4')
+        outfile = dstdir / srcfile.relative_to(srcdir).with_suffix(f'.{outformat}')
 
         if fprefix:
             outfile = outfile.with_stem(fprefix + outfile.stem)
