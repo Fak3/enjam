@@ -45,6 +45,7 @@ app = AsyncTyper(name='enjam', pretty_exceptions_enable=True)
 run = partial(app, standalone_mode=False)
 
 VCodecs = StrEnum('VCodecs', 'libaom-av1 librav1e libsvtav1 libx264 libx265 copy'.split())
+Loglevel = StrEnum('Loglevel', ['debug', 'info', 'warning', 'error'])
 FlieFormat = StrEnum('FlieFormat', ['mp4', 'mkv'])
 
 # Libx264Presets = StrEnum('Libx264Presets', [x.strip() for x in """
@@ -124,7 +125,8 @@ async def main(
     )] = 200,
     grain: int = 0,
     write_log: bool = True,
-    verbose: bool = False,
+    verbose: Annotated[bool, Option(help="Print more verbose messages.")] = False,
+    loglevel: Annotated[Loglevel, Option(help="File log level.")] = 'debug',
     skip_errors: Annotated[bool, Option(
         help="""Continue processing queue after one file error""",
     )] = True,
@@ -145,7 +147,9 @@ async def main(
     # logger.configure(handlers=[])
 
     def stdout_filter(record: loguru.Record) -> bool:
-        """ Loguru sink filter. Return True if record can be printed  to stdout. """
+        """
+        Loguru sink filter. Return True if record can be printed  to stdout.
+        """
         if "srcfile" not in record["extra"]:
             # Outside of task's progressbar show all messages according to loglevel.
             return True
@@ -181,7 +185,7 @@ async def main(
             else:
                 return "{time:HH:mm:ss} {message}\n"
 
-        logger.add(dstdir / 'enjam-log.txt', format=formatter, level='DEBUG' if verbose else 'INFO')
+        logger.add(dstdir / 'enjam-log.txt', format=formatter, level=loglevel.upper())
 
     logger.debug(f"sys.argv: {' '.join(sys.argv)}")
     logger.debug(str(locals()))
