@@ -14,7 +14,7 @@ import asyncio
 import logging
 import json
 import re
-import singnal
+import signal
 import subprocess
 import sys
 
