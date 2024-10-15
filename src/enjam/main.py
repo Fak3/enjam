@@ -9,12 +9,12 @@ from functools import partial
 from fractions import Fraction
 from glob import glob
 from pathlib import Path
-from signal import SIGKILL
 from typing import Optional, Literal
 import asyncio
 import logging
 import json
 import re
+import singnal
 import subprocess
 import sys
 
@@ -462,7 +462,7 @@ async def main(
             if sys.platform == "win32":
                 ffmpeg.terminate()
             else:
-                ffmpeg._process.send_signal(SIGKILL)
+                ffmpeg._process.send_signal(signal.SIGKILL)
             return
 
         # await sleep(0.5)
