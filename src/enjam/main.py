@@ -181,12 +181,13 @@ async def main(
     if write_log:
         def formatter(record: loguru.Record) -> str:
             if "srcfile" in record["extra"]:
-                return "{time:HH:mm:ss} {extra[srcfile]} {message}\n"
+                return "{time:HH:mm:ss} {message}\nPath: {extra[srcfile]}\n\n"
             else:
-                return "{time:HH:mm:ss} {message}\n"
+                return "{time:HH:mm:ss} {message}\n\n"
 
         logger.add(dstdir / 'enjam-log.txt', format=formatter, level=loglevel.upper())
 
+    logger.debug('\nEnjam started')
     logger.debug(f"sys.argv: {' '.join(sys.argv)}")
     logger.debug(str(locals()))
 
