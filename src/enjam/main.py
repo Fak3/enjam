@@ -208,6 +208,8 @@ async def main(
 
     if fprefix:
         fprefix = fprefix.format(**locals()).replace('lib', '')
+        if fprefix[-1].isalnum():
+            fprefix = fprefix + '_'
 
     # source_files = glob('**/*.gif', root_dir=srcdir, recursive=True)
 
