@@ -223,6 +223,9 @@ async def main(
            and exclude_dstdir:
             # Skip files inside dstdir if it is inside srcdir.
             continue
+        if fprefix and file.name.startswith(fprefix):
+            logger.debug(f'Skip {file}, as it starts with given output file prefix "{fprefix}".')
+            continue
         source_files.append(file)
 
     progressbar = Progress(
