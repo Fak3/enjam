@@ -255,6 +255,8 @@ async def main(
         stdout, stderr = await ffsubprocess.communicate()
 
         if ffsubprocess.returncode != 0:
+            progressbar.log(f'"{srcfile}" {stderr.decode()}')
+            progressbar.log(f'"{srcfile}" {stdout.decode()}')
             logger.debug(stderr.decode())
             logger.debug(stdout.decode())
             return 0
@@ -275,7 +277,7 @@ async def main(
             except Exception as err:
                 progressbar.update(task, completed=100, info=f'ERR ')
                 logger.error(repr(err))
-                progressbar.log(f'{srcfile} {repr(err)}')
+                progressbar.log(f'"{srcfile}" {repr(err)}')
                 if not skip_errors:
                     raise err  # Abort all tasks.
         return 0
@@ -443,11 +445,11 @@ async def main(
                 return
             logger.warning(message)
             if verbose:
-                progressbar.log(rich.markup.escape(f'{srcfile}\n{message}'))
+                progressbar.log(rich.markup.escape(f'"{srcfile}"\n{message}'))
 
         @ffmpeg.on("start")
         def on_start(arguments: list[str]) -> None:
-            args = (f'"{arg}"' if arg.startswith('/') else arg for arg in arguments)
+            args = (f"'{arg}'" if arg.startswith('/') else arg for arg in arguments)
             logger.debug(f"FFMPEG command: {' '.join(args)}")
 
         @ffmpeg.on("progress")
@@ -475,9 +477,9 @@ async def main(
         ratio = float(srcfile.stat().st_size) / outfile.stat().st_size
 
         progressbar.update(task, completed=100, info=f'{ratio: >3.1f}x')
-        logger.debug(f"Written {naturalsize(outfile.stat().st_size, gnu=True)}, "
-                     f"comression ratio {ratio:.1f}; "
-                     f"took {progressbar._tasks[task].elapsed:.3f}s {outfile}")
+        logger.debug(f"Written {naturalsize(outfile.stat().st_size, gnu=True)}\n"
+                     f"Comression ratio {ratio:.1f}\n"
+                     f"Took {progressbar._tasks[task].elapsed:.3f}s")
 
         return ratio
                 
