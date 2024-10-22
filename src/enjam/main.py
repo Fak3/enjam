@@ -42,7 +42,7 @@ from .aiotyper import AsyncTyper
 
 # app = AsyncTyper(name='enjam', pretty_exceptions_enable=True, rich_markup_mode=None)
 app = AsyncTyper(name='enjam', pretty_exceptions_enable=True)
-run = partial(app, standalone_mode=False)
+run = partial(app, standalone_mode=True)
 
 VCodecs = StrEnum('VCodecs', 'libaom-av1 librav1e libsvtav1 libx264 libx265 copy'.split())
 Loglevel = StrEnum('Loglevel', ['debug', 'info', 'warning', 'error'])
