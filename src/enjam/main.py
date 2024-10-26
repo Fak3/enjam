@@ -123,6 +123,9 @@ async def main(
         help="""Group of pictures size. The GOP size sets the maximum distance
         between key frames. Higher GOP size results in smaller file size. """
     )] = 200,
+    resolution: Annotated[int, Option(
+        help=""" Output resolution height in pixels. """
+    )] = None,
     grain: int = 0,
     write_log: bool = True,
     verbose: Annotated[bool, Option(help="Print more verbose messages.")] = False,
@@ -201,6 +204,9 @@ async def main(
 
     if vbitrate and crf:
         raise UsageError("Specify only one option --crf or --vbitrate")
+
+    if resolution and vcodec == 'copy':
+        raise UsageError("Changing resolution is not supported with vcodec 'copy'")
 
     if not vbitrate and not crf:
         crf = 24
@@ -298,7 +304,7 @@ async def main(
 
         outfile.parent.mkdir(parents=True, exist_ok=True)
 
-        nframes, resolution = None, None
+        nframes, in_resolution = None, None
         try:
             streams = await ffprobe(f'-show_streams -select_streams v "{srcfile}"')
 
@@ -313,7 +319,7 @@ async def main(
             # nframes = int(stream["nb_read_frames"])
             nframes = int(duration * frame_rate)
 
-            resolution = int(stream["width"]) * int(stream["height"])
+            in_resolution = int(stream["width"]) * int(stream["height"])
         except Exception as err:
             logger.warning(str(err))
             progressbar.update(task, nframes='?')
@@ -321,35 +327,42 @@ async def main(
             progressbar.update(task, nframes=nframes)
         
         if vbitrate and vbitrate.startswith('x'):
-            if resolution is None:
+            if in_resolution is None:
                 raise Exception(
                     "Failed to get resolution to calculate requested vbitrate ratio"
                 )
 
-            vb = resolution * numify(vbitrate[1:])
+            vb = in_resolution * numify(vbitrate[1:])
         else:
             vb = vbitrate
 
-        logger.debug(f'Resolution {resolution} crf {crf} bitrate {vb}')
+        logger.debug(f'Resolution {in_resolution} crf {crf} bitrate {vb}')
 
         if crf and vcodec == 'librav1e':
             quality = {'qp': crf}  # no support for crf, use quantization parameter
         else:
             quality = {'crf': crf} if crf else {'b:v': vb}
 
-        if 'gif' in pattern:
-            quality['vf'] = "scale=trunc(iw/2)*2:trunc(ih/2)*2"
+        scale = {}
+        if resolution:
+            scale['vf'] = f"scale=-1:{resolution},setsar=1:1"
+        elif 'gif' in pattern:
+            scale['vf'] = "scale=trunc(iw/2)*2:trunc(ih/2)*2"
 
+        # 'filter:v': "setpts=4.0*PTS"
         # .option('loglevel', 'quiet')
+
+        audio = {}
+        if not acodec == 'none':
+            audio = {
+                'codec:a': acodec, 'b:a': abitrate,
+                # 'codec:a': acodec, 'ab': abitrate
+            }
 
         ffmpeg = FFmpeg().option("y").option('hide_banner')\
             .option('nostdin')\
             .input(srcdir/srcfile).output(outfile,
             {
-                'codec:a': acodec, 'b:a': abitrate,
-                # 'codec:a': acodec, 'ab': abitrate
-                # 'filter:v': "setpts=4.0*PTS"
-            } | {
                 'copy': {"codec:v": "copy"},
                 'librav1e': {"codec:v": "librav1e",
                     # 'rav1e-params': f'keyint={gop}',
@@ -430,7 +443,7 @@ async def main(
                     ]),
                     'denoise-noise-level': grain,
                 },
-            }[vcodec] | quality,
+            }[vcodec] | quality | scale | audio,
             g=gop, pix_fmt='yuv420p10le',
             # r=0.1
         )
