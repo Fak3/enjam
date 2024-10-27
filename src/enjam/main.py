@@ -127,6 +127,7 @@ async def main(
         help=""" Output resolution height in pixels. """
     )] = None,
     grain: int = 0,
+    svt_variance_boost: int = 0,
     write_log: bool = True,
     verbose: Annotated[bool, Option(help="Print more verbose messages.")] = False,
     loglevel: Annotated[Loglevel, Option(help="File log level.")] = 'debug',
@@ -421,8 +422,25 @@ async def main(
                     'tune': 'ssim',
                 },
                 'libsvtav1': {"codec:v": "libsvtav1",
+
+                    #
                     # 'svtav1-params': f'tune=0:film-grain={grain}:errlog=/dev/null',
-                    'svtav1-params': f'tune=0:film-grain={grain}',
+                    'svtav1-params': ':'.join([
+                        # Tune 1 is for PSNR RDO, Tune 2 is for SSIM RDO, & Tune 0 is a psychovisual tune labeled VQ. It has been common practice to lean away from the PSNR tune, as it is not designed for visual quality but rather to perform better on the PSNR metric which is widely considered to be inconsistent with our human perception of fidelity. Using the VQ tune is a safe bet for now, but many believe the newer SSIM tune provides better visual fidelity. Using SVT-AV1-PSY, the custom Subjective SSIM tune (Tune 3) provides the best of both Tune 2 & Tune 0 with additional improvements as well.
+                        f'tune=0',
+                        f'film-grain={grain}',
+
+                        # variance-boost-strength 1 to 4
+                        #
+                        # Provides control over our augmented AQ Modes 0 and 2 which can utilize variance information in each frame for more consistent quality under high/low contrast scenes. Four curve options are provided, and the default is curve 2. 1: mild, 2: gentle, 3: medium, 4: aggressive
+                        #
+                        # variance-octile 1 to 8
+                        #
+                        # Controls how "selective" the algorithm is when boosting superblocks, based on their low/high 8x8 variance ratio. A value of 1 is the least selective, and will readily boost a superblock if only 1/8th of the superblock is low variance. Conversely, a value of 8 will only boost if the entire superblock is low variance. Lower values increase bitrate. The default value is 6.
+                        #
+                        # NOTE: From my experience enabling variance-boost introduces more distortions than decreasing crf
+                        f'enable-variance-boost=1:variance-boost-strength={svt_variance_boost}' if svt_variance_boost else 'enable-variance-boost=0',
+                    ]),
                     'preset': speed,
                 },
                 'libaom-av1': {"codec:v": "libaom-av1",
