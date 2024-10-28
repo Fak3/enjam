@@ -466,6 +466,9 @@ async def main(
             # r=0.1
         )
 
+        if acodec == 'none':
+            ffmpeg = ffmpeg.option("an")
+
         @ffmpeg.on("stderr")
         def on_stderr(message: str) -> None:
             if '[error]' not in message \
