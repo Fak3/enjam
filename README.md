@@ -44,13 +44,20 @@ Options:
                                   the maximum distance between key frames.
                                   Higher GOP size results in smaller file
                                   size.   [default: 200]
+  --resolution INTEGER            Output resolution height in pixels.
   --grain INTEGER                 [default: 0]
+  --svt-variance-boost INTEGER    [default: 0]
   --write-log / --no-write-log    [default: write-log]
-  --verbose / --no-verbose        [default: no-verbose]
+  --verbose / --no-verbose        Print more verbose messages.  [default: no-
+                                  verbose]
+  --loglevel [debug|info|warning|error]
+                                  File log level.  [default: debug]
   --skip-errors / --no-skip-errors
                                   Continue processing queue after one file
                                   error  [default: skip-errors]
-  --pattern TEXT                  [default: *.gif]
+  --pattern TEXT                  Source file glob search pattern. Example:
+                                  'Camera1*.mp4'   [default: *.gif]
+  --outformat [mp4|mkv]           Output file format.   [default: mkv]
   --install-completion            Install completion for the current shell.
   --show-completion               Show completion for the current shell, to
                                   copy it or customize the installation.
