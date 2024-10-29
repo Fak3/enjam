@@ -471,15 +471,17 @@ async def main(
 
         @ffmpeg.on("stderr")
         def on_stderr(message: str) -> None:
+            if not message.startswith('['):
+                return
+
             if '[error]' not in message \
                and 'Error' not in message \
+               and 'unsupported' not in message \
                and 'out of range' not in message \
-               and 'failed' not in message \
-               and not message.startswith('['):
+               and 'failed' not in message:
                 return
             logger.warning(message)
-            if verbose:
-                progressbar.log(rich.markup.escape(f'"{srcfile}"\n{message}'))
+            progressbar.log(rich.markup.escape(f'"{srcfile}"\n{message}'))
 
         @ffmpeg.on("start")
         def on_start(arguments: list[str]) -> None:
