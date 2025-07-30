@@ -119,6 +119,10 @@ async def main(
         set to the same pattern as dst dir name. Example: {vcodec}-{crf}-""",
         show_default="f'{dst.name}-' if '{' in dst else None"
     )] = None,
+    fsuffix: Annotated[str, Option(
+        help="""Output file suffix. Can include variables.
+        Example: {vcodec}-{crf}-""",
+    )] = None,
     gop: Annotated[int, Option(
         help="""Group of pictures size. The GOP size sets the maximum distance
         between key frames. Higher GOP size results in smaller file size. """
@@ -218,6 +222,11 @@ async def main(
         if fprefix[-1].isalnum():
             fprefix = fprefix + '_'
 
+    if fsuffix:
+        fsuffix = fsuffix.format(**locals()).replace('lib', '')
+        if fsuffix[0].isalnum():
+            fsuffix = '_' + fsuffix
+
     # source_files = glob('**/*.gif', root_dir=srcdir, recursive=True)
 
     # source_files = list(srcdir.rglob('*.gif'))
@@ -296,6 +305,9 @@ async def main(
 
         if fprefix:
             outfile = outfile.with_stem(fprefix + outfile.stem)
+
+        if fsuffix:
+            outfile = outfile.with_stem(outfile.stem + fsuffix)
 
         if outfile == srcfile:
             raise ValueError(
@@ -534,7 +546,6 @@ async def main(
         logger.warning(f'Main task cancelled')
         # return
         sys.exit(1)
-
 
     await sleep(0.001)
 
