@@ -359,7 +359,8 @@ async def main(
         scale = {}
         if resolution:
             scale['vf'] = f"scale=-1:{resolution},setsar=1:1"
-        elif 'gif' in pattern:
+        else:
+            # Make width and height divisible by 2 - required for YUV_420 colorspace
             scale['vf'] = "scale=trunc(iw/2)*2:trunc(ih/2)*2"
 
         # 'filter:v': "setpts=4.0*PTS"
