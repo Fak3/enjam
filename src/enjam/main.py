@@ -359,7 +359,7 @@ async def main(
         scale = {}
         if resolution:
             scale['vf'] = f"scale=-1:{resolution},setsar=1:1"
-        else:
+        elif not vcodec == 'copy':
             # Make width and height divisible by 2 - required for YUV_420 colorspace
             scale['vf'] = "scale=trunc(iw/2)*2:trunc(ih/2)*2"
 
