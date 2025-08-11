@@ -1,6 +1,6 @@
 [![PyPI Version](https://img.shields.io/pypi/v/enjam)](https://pypi.org/project/enjam/)
 ![Github Actions](https://github.com/Fak3/enjam/workflows/Tests/badge.svg)
-[![codecov](https://codecov.io/gh/Fak3/enjam/branch/main/graph/badge.svg?token=6Q1NS6P9F4)](https://codecov.io/gh/Fak3/enjam)
+![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Fak3/2f003eb465b548b6bb6a551ae46c8e13/raw/covbadge.json)
 
 # Enjam
 
