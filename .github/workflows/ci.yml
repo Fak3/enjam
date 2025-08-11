@@ -82,11 +82,28 @@ jobs:
           pdm install -v -dGtest
           pdm run pip install -U setuptools
           pdm info
+
       - name: Run Tests
-        run: pdm run pytest --doctest-modules -n auto --cov --cov-config=pyproject.toml --cov-report=xml
+        run: |
+          pdm run pytest --doctest-modules -n auto --cov --cov-config=pyproject.toml --cov-report=xml --cov-report=json
+          export TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
+          echo "total=$TOTAL" >> $GITHUB_ENV
 
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
+
+      - name: "Make badge"
+        uses: schneegans/dynamic-badges-action@v1.4.0
+        with:
+          # GIST_TOKEN is a GitHub personal access token with scope "gist".
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: 2f003eb465b548b6bb6a551ae46c8e13   # replace with your real Gist id.
+          filename: covbadge.json
+          label: Coverage
+          message: ${{ env.total }}%
+          minColorRange: 50
+          maxColorRange: 90
+          valColorRange: ${{ env.total }}
