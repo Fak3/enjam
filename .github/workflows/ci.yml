@@ -86,17 +86,16 @@ jobs:
       - name: Run Tests
         run: |
           pdm run pytest --doctest-modules -n auto --cov --cov-config=pyproject.toml --cov-report=xml --cov-report=json
+
+      - name: Calculate total coverage
+        run: |
           export TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
           echo "total=$TOTAL" >> $GITHUB_ENV
-
-      - name: Upload results to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
+        if: matrix.os != 'windows-latest'
 
       - name: "Make badge"
         uses: schneegans/dynamic-badges-action@v1.4.0
+        if: matrix.os != 'windows-latest'
         with:
           # GIST_TOKEN is a GitHub personal access token with scope "gist".
           auth: ${{ secrets.GIST_TOKEN }}
@@ -107,3 +106,9 @@ jobs:
           minColorRange: 50
           maxColorRange: 90
           valColorRange: ${{ env.total }}
+
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
