@@ -4,6 +4,7 @@ from __future__ import annotations
 from asyncio import sleep
 from asyncio.subprocess import PIPE
 from datetime import datetime
+from dataclasses import dataclass, astuple
 from enum import StrEnum
 from functools import partial
 from fractions import Fraction
@@ -300,8 +301,8 @@ async def main(
                     raise err  # Abort all tasks.
         return 0
 
-    async def _convert(srcfile: Path, task: Task) -> int:
-        """ Main job. Convert one file, return compression ratio. """
+    async def _convert(srcfile: Path, task: Task) -> (Path, float):
+        """ Main job. Convert one file, return tuple of compression ratio and outfile path. """
 
         outfile = dstdir / srcfile.relative_to(srcdir).with_suffix(f'.{outformat}')
 
@@ -522,29 +523,41 @@ async def main(
                 ffmpeg.terminate()
             else:
                 ffmpeg._process.send_signal(signal.SIGKILL)
-            return
+
+            # Return negative compression ratio to be excluded from summary calculation.
+            return (-1.0, outfile)
 
         # await sleep(0.5)
         ratio = float(srcfile.stat().st_size) / outfile.stat().st_size
 
         progressbar.update(task, completed=100, info=f'{ratio: >3.1f}x')
         logger.debug(f"Written {naturalsize(outfile.stat().st_size, gnu=True)}\n"
-                     f"Comression ratio {ratio:.1f}\n"
+                     f"Compression ratio {ratio:.1f}\n"
                      f"Took {progressbar._tasks[task].elapsed:.3f}s")
 
-        return ratio
+        return (ratio, outfile)
                 
     start_time = datetime.now()
-    ratios = []
+
+    @dataclass(order=True)
+    class Result:
+        ratio: float
+        path: Path
+
+    results: list[Result] = []
 
     try:
         with progressbar:
             # async with asyncio.TaskGroup() as tg:
             #     for srcfile in source_files:
             #         tg.create_task(convert(srcfile))
-            async with amap(convert, source_files, max_at_once=jobs) as results:
-                async for ratio in results:
-                    ratios.append(ratio)
+            async with amap(convert, source_files, max_at_once=jobs) as jobresults:
+                async for result in jobresults:
+                    if not isinstance(result, tuple):
+                        results.append(Result(-1.0, ''))
+                        continue
+                    # outfile, ratio = result
+                    results.append(Result(*result))
     except asyncio.CancelledError as e:
         logger.warning(f'Main task cancelled')
         # return
@@ -552,7 +565,7 @@ async def main(
 
     await sleep(0.001)
 
-    positive = [x for x in ratios if x > 0]
+    positive = [x.ratio for x in results if x.ratio > 0]
     if positive:
         logger.info(f'Average compression ratio: {sum(positive) / len(positive):.1f}')
 
@@ -560,9 +573,13 @@ async def main(
 
     logger.info(f'Successfully processed {len(positive)} files')
 
-    if len(ratios) - len(positive) > 0:
-        logger.info(f'Failed to process {len(ratios) - len(positive)} files')
+    if len(results) - len(positive) > 0:
+        logger.info(f'Failed to process {len(results) - len(positive)} files')
 
+    # Write summary by compression ratio
+    ratios = "\n".join(f"{x.ratio:.1f}x {x.path}" for x in sorted(results) if x.ratio > 0)
+    logger.info(f'Compression ratios:\n{ratios}')
     
+
 if __name__ == '__main__':
     app(standalone_mode=False)
