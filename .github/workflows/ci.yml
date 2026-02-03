@@ -37,7 +37,7 @@ jobs:
         python-version: ["3.11", "3.12.6"]
         # os: [ubuntu-latest, windows-latest, macos-latest]
         os: [ubuntu-latest, windows-latest]
-        ffmpeg-version: ["6.1", "7.1"]
+        ffmpeg-version: ["6.1", "7.1", "8.0"]
     steps:
       - uses: actions/checkout@v4
 
