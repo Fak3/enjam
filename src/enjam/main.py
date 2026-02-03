@@ -37,11 +37,13 @@ from typer import Option, Abort
 from typing_extensions import Annotated
 
 from .numify import numify
-from .aiotyper import AsyncTyper
+from . import aiotyper
 
 
-# app = AsyncTyper(name='enjam', pretty_exceptions_enable=True, rich_markup_mode=None)
-app = AsyncTyper(name='enjam', pretty_exceptions_enable=True)
+# app = aiotyper.AsyncTyper(name='enjam', pretty_exceptions_enable=True, rich_markup_mode=None)
+app = aiotyper.AsyncTyper(name='enjam', pretty_exceptions_enable=True)
+
+# Installed enjam package launches "enjam.main:run" as specified in pyproject.toml
 run = partial(app, standalone_mode=True)
 
 VCodecs = StrEnum('VCodecs', 'libaom-av1 librav1e libsvtav1 libx264 libx265 copy'.split())
